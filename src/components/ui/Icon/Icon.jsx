@@ -1,5 +1,5 @@
 import React from 'react';
-import { string } from 'prop-types';
+import PropTypes from 'prop-types';
 
 
 const Icon = ({ src, title }) => (
@@ -10,8 +10,8 @@ Icon.defaultProps = {
   title: null,
 };
 Icon.propTypes = {
-  src: string.isRequired,
-  title: string,
+  src: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };
 
 export default Icon;
