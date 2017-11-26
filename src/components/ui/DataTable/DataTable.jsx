@@ -3,46 +3,34 @@ import {
   array,
   arrayOf,
   bool,
-  node,
   shape,
-  string,
 } from 'prop-types';
 import {
-  map,
   filter,
 } from 'lodash';
 import Loader from 'react-loader';
-import { Table } from 'react-bootstrap';
-import TableHead from './TableHead';
-import BodyRow from './BodyRow';
+import ReactTable from 'react-table';
+import 'react-table/react-table.css';
 
 
 const DataTable = (props) => {
   const {
-    data,
-    dataDefenition,
+    columns,
     isLoading,
     ...options
   } = props;
-  const activeDataDefenition = filter(dataDefenition, 'active');
-  const columns = map(activeDataDefenition, 'title');
+  const activeColumns = filter(columns, 'active');
 
   const table = (
-    <Table {...options}>
-      <TableHead columns={columns} />
-      <tbody>
-        {data.map((rowData) => (
-          <BodyRow
-            key={rowData.id}
-            dataDefinition={activeDataDefenition}
-            rowData={rowData}
-          />))}
-      </tbody>
-    </Table>
+    <ReactTable
+      className="-striped -highlight"
+      columns={activeColumns}
+      {...options}
+    />
   );
   return (
     <Loader loaded={!isLoading}>
-      {(!(data && data.length))
+      {(!(options.data && options.data.length))
         ? <div>No data found</div>
         : table
     }
@@ -57,10 +45,8 @@ DataTable.defaultProps = {
 DataTable.propTypes = {
 // eslint-disable-next-line react/forbid-prop-types
   data: array.isRequired,
-  dataDefenition: arrayOf(shape({
-    title: string.isRequired,
-    key: string.isRequired,
-    component: node,
+  columns: arrayOf(shape({
+    active: bool.isRequired,
   })).isRequired,
   isLoading: bool,
 };

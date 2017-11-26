@@ -1,30 +1,87 @@
 import React from 'react';
-import DataTable from 'components/ui/DataTable/DataTable';
+import DataTable from 'components/ui/DataTable';
+import dataJSON from 'data.json';
+import Icon from 'components/ui/Icon';
+import pause from 'static/img/pause-icon.png';
+import play from 'static/img/play-icon.png';
+
+const statusAccessor = (d) => {
+  if (!d.state) return null;
+
+  const src = d.state === 'new' ? play : pause;
+  return <Icon src={src} />;
+};
 
 const dataDefinition = [
   {
-    id: 1, active: true, title: 'Name', key: 'name',
+    active: true, Header: 'Кампании', columns: [{ id: 'value', accessor: d => <a href="/">{d.value}</a> }],
   },
   {
-    id: 2, active: true, title: 'First name', key: 'first-name', parent: 1,
+    active: true, Header: 'Статус', columns: [{ id: 'status', accessor: statusAccessor, width: 76 }],
   },
   {
-    id: 3, active: true, title: 'Last name', key: 'last-name', parent: 1,
+    active: true, Header: 'Показы', columns: [{ id: 'shows', accessor: d => d.costs.shows }],
   },
   {
-    id: 4, active: true, title: 'Email', key: 'email',
+    active: true, Header: 'Клики', columns: [{ id: 'clicks', accessor: d => d.costs.clicks }],
+  },
+  {
+    active: true, Header: 'CTR', columns: [{ id: 'ctr', accessor: d => `${d.costs.ctr}%` }],
+  },
+  {
+    active: true, Header: 'CPS', columns: [{ id: 'cpc', accessor: d => d.costs.cpc }],
+  },
+  {
+    active: true, Header: 'Затраты', columns: [{ id: 'cost', accessor: d => d.costs.cost }],
   },
 ];
 
-const data = [
-  { id: 1, name: 'user 1', email: 'test@gmail.com' },
-  { id: 2, name: 'user 2', email: 'temp@gmail.com' },
-];
+const GOALS_HEADERS = {
+  cpa: 'CPA, р.',
+  cr: 'CR, %',
+  count: 'Кол-во',
+  revenue: 'Revenue, р.',
+  gross_profit: 'Gross Profit, р.',
+  roi: 'ROI',
+};
+
+const renderGoalName = (name, index) => (
+  <div>
+    <div style={{ color: '#97123F' }}>{name}</div>
+    <div style={{ color: '#8A8A8A' }}>&ndash; Цель {index + 1} &ndash;</div>
+  </div>
+);
+
+const getGoalsColumns = (idx) => {
+  const sampleGoal = dataJSON.content[0].goals[idx];
+  return Object.keys(GOALS_HEADERS)
+    .filter(headerKey => Object.prototype.hasOwnProperty.call(sampleGoal, headerKey))
+    .map(headerKey => ({
+      active: true,
+      Header: GOALS_HEADERS[headerKey],
+      id: `${headerKey}-${idx}`,
+      accessor: d => d.goals[idx][headerKey],
+    }));
+};
+
+const goalHeaders = dataJSON.goals_list.map(({ name }, idx) => (
+  { active: true, Header: renderGoalName(name, idx), columns: getGoalsColumns(idx) }
+));
+
+const columns = [...dataDefinition, ...goalHeaders];
 
 export default function HomePage() {
+  const data = dataJSON.content;
+
   return (
-    <div className="container">
-      <DataTable data={data} dataDefenition={dataDefinition} />
+    <div className="container-fluid">
+      <DataTable
+        data={data}
+        defaultPageSize={dataJSON.content.length + 1}
+        columns={columns}
+        showPagination={false}
+        sortable={false}
+      />
     </div>
   );
 }
