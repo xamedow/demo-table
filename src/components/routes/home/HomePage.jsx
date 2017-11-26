@@ -71,7 +71,10 @@ const goalHeaders = dataJSON.goals_list.map(({ name }, idx) => (
 const columns = [...dataDefinition, ...goalHeaders];
 
 export default function HomePage() {
-  const data = dataJSON.content;
+  const data = [
+    Object.assign({}, dataJSON.total, { value: 'Total' }),
+    ...dataJSON.content,
+  ];
 
   return (
     <div className="container-fluid">
