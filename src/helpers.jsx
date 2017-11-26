@@ -24,9 +24,11 @@ const getGoalsInnerColumns = ({ dataJSON, idx }) => {
 
 // eslint-disable-next-line import/prefer-default-export
 export const getGoalsColumns = (dataJSON) => (
-  dataJSON.goals_list.map(({ name }, idx) => (
+  dataJSON.goals_list.map(({ name, goal_id }, idx) => (
     {
       active: true,
+      id: goal_id,
+      name,
       Header: <GoalName name={name} index={idx} />,
       columns: getGoalsInnerColumns({ dataJSON, idx }),
     }

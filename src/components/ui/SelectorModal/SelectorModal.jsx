@@ -1,58 +1,49 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 import {
   Button,
   Checkbox,
-  MenuItem,
   Modal,
 } from 'react-bootstrap';
 
-class SelectorModal extends React.Component {
-  renderSelectors = () => {
-    return this.props.columns.map(column => (
-      <MenuItem>
-        <Checkbox
-          checked={column.active}
-          onClick={() => {}}
-          />
-        {column.Header}
-      </MenuItem>
-    ))
-  };
+const renderSelectors = (columns, className = '') => (
+  columns.map(column => (
+    <div className={className} key={column.id}>
+      <Checkbox
+        inline
+        checked={column.active}
+        onClick={() => {
+        }}
+      >
+        {(typeof column.Header === 'string') ? column.Header : column.name}
+      </Checkbox>
+      {
+        (column.columns && column.name) ? renderSelectors(column.columns, 'selector-modal__inner') : null
+      }
+    </div>
+  )));
 
-  render() {
-    const { isOpen, handleSubmit, handleClose } = this.props;
-    return (
-      <Modal show={isOpen} onHide={handleClose}>
-        <Modal.Body>
-          <ul>
-            {this.renderSelectors()}
-          </ul>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={() => handleSubmit}>OK</Button>
-          <Button onClick={handleClose}>ОТМЕНИТЬ</Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  }
-}
+const SelectorModal = ({ isOpen, handleSubmit, handleClose, columns }) => (
+  <Modal show={isOpen} onHide={handleClose}>
+    <Modal.Body>
+      {renderSelectors(columns)}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button bsStyle="primary" onClick={() => handleSubmit}>OK</Button>
+      <Button onClick={handleClose}>ОТМЕНИТЬ</Button>
+    </Modal.Footer>
+  </Modal>
+);
 
 SelectorModal.propTypes = {
-  // myProp: PropTypes.string.isRequired
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    active: PropTypes.bool.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    Header: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  })).isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  handleClose: PropTypes.func.isRequired,
 };
 
-function mapStateToProps(state, ownProps) {
-  return {
-    state,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch),
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SelectorModal);
+export default SelectorModal;

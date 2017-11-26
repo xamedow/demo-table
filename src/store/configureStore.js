@@ -2,10 +2,15 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import axios from 'axios';
 import axiosMiddleware from 'redux-axios-middleware';
 import thunkMiddleware from 'redux-thunk';
+import { createLogger } from 'redux-logger';
 import getReduxDevTools from './getReduxDevTools';
 import rootReducer from './modules';
 
-const middlewares = [thunkMiddleware, axiosMiddleware(axios)];
+const logger = createLogger({
+  collapsed: true,
+});
+
+const middlewares = [thunkMiddleware, axiosMiddleware(axios), logger];
 
 export default function configureStore(initialState) {
   const store = createStore(
