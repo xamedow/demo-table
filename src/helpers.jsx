@@ -1,4 +1,5 @@
 import React from 'react';
+import { get, flattenDeep } from 'lodash';
 import { GoalName, StatusIcon, ModalLinkWrapper } from 'components/ui/DataTable';
 
 const GOALS_HEADERS = {
@@ -72,9 +73,51 @@ const getGoalsColumns = (dataJSON) => (
     }
   )));
 
+function columnToKeyActive(column) {
+  return {[column.id]: column.active};
+}
+
+export function pickColumns(columns) {
+  return (flattenDeep(columns.map((column) => {
+    if (column.name && column.columns) {
+      return [columnToKeyActive(column), pickColumns(column.columns)];
+    }
+
+    return columnToKeyActive(column);
+  })).reduce((acc, column) => Object.assign(acc, column), {}));
+}
+
+export function saveColumns(columns) {
+  if (window.localStorage) {
+    window.localStorage.setItem('columns', JSON.stringify(pickColumns(columns)));
+  }
+}
+
+export function getSavedColumns() {
+  if (window.localStorage) {
+    return JSON.parse(window.localStorage.getItem('columns'));
+  }
+  return null;
+}
+
+export function mergeColumnsData(savedColumnsData, rawColumns) {
+  return rawColumns.map(column => {
+    const nextColumn = Object.assign({}, column);
+    if (nextColumn.name && nextColumn.columns) {
+      nextColumn.columns = mergeColumnsData(savedColumnsData, nextColumn.columns);
+    }
+
+    const active = get(savedColumnsData, `${[nextColumn.id]}`, false);
+    return Object.assign({}, nextColumn, { active });
+  });
+}
+
 export const getColumns = (dataJSON) => {
+  const savedColumnsData = getSavedColumns();
   const goalsColumns = getGoalsColumns(dataJSON);
-  return [...MAIN_DATA_DEFINITION, ...goalsColumns];
+  const rawColumns = [...MAIN_DATA_DEFINITION, ...goalsColumns];
+
+  return savedColumnsData ? mergeColumnsData(savedColumnsData, rawColumns) : rawColumns;
 };
 
 export const mergeGoalsColumns = (source, target) => (

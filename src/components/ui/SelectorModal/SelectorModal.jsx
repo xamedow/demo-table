@@ -52,7 +52,7 @@ export default class SelectorModal extends React.Component {
           {this.renderSelectors(columns)}
         </Modal.Body>
         <Modal.Footer>
-          <Button bsStyle="primary" onClick={handleSubmit}>OK</Button>
+          <Button bsStyle="primary" onClick={() => handleSubmit(columns)}>OK</Button>
           <Button onClick={handleClose}>ОТМЕНИТЬ</Button>
         </Modal.Footer>
       </Modal>

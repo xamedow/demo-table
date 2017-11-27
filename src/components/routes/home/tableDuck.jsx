@@ -1,5 +1,5 @@
 import { appName } from 'config';
-import { getColumns, mergeGoalsColumns } from 'helpers';
+import { getColumns, saveColumns, mergeGoalsColumns } from 'helpers';
 
 /**
  * Constants
@@ -29,6 +29,9 @@ export default function reducer(state = ReducerRecord, action) {
   switch (type) {
     case SET_COLUMNS:
       return Object.assign({}, state, { columns: getColumns(payload) });
+
+    case UPDATE_COLUMNS:
+      return Object.assign({}, state, { isModalOpen: false });
 
     case UPDATE_COLUMN:
       return Object.assign({}, state, { columns: mergeGoalsColumns(payload, state.columns) });
@@ -62,7 +65,8 @@ export function updateColumn(id, active) {
   };
 }
 
-export function updateColumns() {
+export function updateColumns(columns) {
+  saveColumns(columns);
   return {
     type: UPDATE_COLUMNS,
   };
