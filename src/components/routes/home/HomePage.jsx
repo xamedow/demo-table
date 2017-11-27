@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import DataTable from 'components/ui/DataTable';
 import dataJSON from 'data.json';
 import SelectorModal from 'components/ui/SelectorModal';
-import { setColumns, updateColumns, hideModal } from './tableDuck';
+import { setColumns, updateColumns, updateColumn, hideModal } from './tableDuck';
 
 class HomePage extends React.Component {
   componentDidMount() {
@@ -32,6 +32,7 @@ class HomePage extends React.Component {
           isOpen={isModalOpen}
           handleClose={this.props.hideModal}
           handleSubmit={this.props.updateColumns}
+          updateColumn={this.props.updateColumn}
           columns={columns}
         />
       </div>
@@ -46,6 +47,7 @@ HomePage.propTypes = {
   })).isRequired,
   getColumns: PropTypes.func.isRequired,
   updateColumns: PropTypes.func.isRequired,
+  updateColumn: PropTypes.func.isRequired,
   hideModal: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   isModalOpen: PropTypes.bool.isRequired,
@@ -55,4 +57,4 @@ function mapStateToProps(state) {
   return { ...state.table };
 }
 
-export default connect(mapStateToProps, { getColumns: setColumns, updateColumns, hideModal })(HomePage);
+export default connect(mapStateToProps, { getColumns: setColumns, updateColumns, updateColumn, hideModal })(HomePage);

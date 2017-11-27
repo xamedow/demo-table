@@ -20,11 +20,17 @@ const DataTable = (props) => {
     ...options
   } = props;
   const activeColumns = filter(columns, 'active');
+  const activeInnerColumns = activeColumns.map(activeColumn => {
+    if (activeColumn.name && activeColumn.columns) {
+      return Object.assign({}, activeColumn, { columns: filter(activeColumn.columns, 'active') });
+    }
+    return activeColumn;
+  });
 
   const table = (
     <ReactTable
       className="-striped -highlight"
-      columns={activeColumns}
+      columns={activeInnerColumns}
       {...options}
     />
   );
