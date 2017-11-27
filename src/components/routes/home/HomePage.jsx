@@ -1,16 +1,60 @@
 import React from 'react';
-import Button from 'components/ui/Button/Button';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import DataTable from 'components/ui/DataTable';
+import dataJSON from 'data.json';
+import SelectorModal from 'components/ui/SelectorModal';
+import { setColumns, updateColumns, updateColumn, hideModal } from './tableDuck';
 
-export default function HomePage() {
-  return (
-    <div>
-      <h1 style={{ fontSize: 50, fontWeigth: 'bold', textAlign: 'center' }}>
-        React Pages Boilerplate
-      </h1>
+class HomePage extends React.Component {
+  componentDidMount() {
+    this.props.getColumns(dataJSON);
+  }
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button theme="blue">Click me!!</Button>
+  data = [
+    Object.assign({}, dataJSON.total, { value: 'Total' }),
+    ...dataJSON.content,
+  ];
+
+  render() {
+    const { columns, loading, isModalOpen } = this.props;
+    return (
+      <div className="container-fluid">
+        <DataTable
+          data={this.data}
+          defaultPageSize={dataJSON.content.length + 1}
+          columns={columns}
+          showPagination={false}
+          sortable={false}
+          isLoading={loading}
+        />
+        <SelectorModal
+          isOpen={isModalOpen}
+          handleClose={this.props.hideModal}
+          handleSubmit={this.props.updateColumns}
+          updateColumn={this.props.updateColumn}
+          columns={columns}
+        />
       </div>
-    </div>
-  );
+    );
+  }
 }
+
+HomePage.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    active: PropTypes.bool.isRequired,
+    Header: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  })).isRequired,
+  getColumns: PropTypes.func.isRequired,
+  updateColumns: PropTypes.func.isRequired,
+  updateColumn: PropTypes.func.isRequired,
+  hideModal: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  isModalOpen: PropTypes.bool.isRequired,
+};
+
+function mapStateToProps(state) {
+  return { ...state.table };
+}
+
+export default connect(mapStateToProps, { getColumns: setColumns, updateColumns, updateColumn, hideModal })(HomePage);

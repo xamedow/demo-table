@@ -17,3 +17,31 @@ body {
   color: $color-black;
   font-family: $font-family;
 }
+
+.ReactTable {
+  border-color: #D5D5D5;
+}
+
+.rt-tr-group {
+  &:first-child {
+    background-color: #E3EBF2;
+  }
+}
+
+.rt-th {
+  font-size: 12px;
+}
+
+.rt-td {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+
+  &:not(:first-child) {
+    justify-content: center;
+  }
+}
+
+.selector-modal__inner {
+  margin-left: 24px;
+}
